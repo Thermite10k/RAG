@@ -37,10 +37,11 @@ import fitz  # PyMuPDF
 NOTE_MARKER = "[NOTE]"
 
 
-def parse_pdf(path: str | Path) -> list[dict]:
+def parse_pdf(path: str | Path, doc_id: str | None = None) -> list[dict]:
     """Parse a single PDF into a list of per-slide records."""
     path = Path(path)
-    doc_id = path.stem
+    if doc_id == None:
+        doc_id = path.stem
     records: list[dict] = []
 
     with fitz.open(path) as doc:
@@ -76,8 +77,10 @@ def parse_directory(pdf_dir: str | Path, pattern: str = "*.pdf") -> list[dict]:
     """Parse every PDF in a directory (non-recursive) into one record list."""
     pdf_dir = Path(pdf_dir)
     records: list[dict] = []
-    for pdf_path in sorted(pdf_dir.glob(pattern)):
-        records.extend(parse_pdf(pdf_path))
+    for pdf_path in sorted(pdf_dir.rglob(pattern)):
+        rel = pdf_path.relative_to(pdf_dir).with_suffix("")
+        doc_id = rel.as_posix()
+        records.extend(parse_pdf(pdf_path, doc_id=doc_id))
     return records
 
 

@@ -1,0 +1,523 @@
+QUESTION:
+Explain how k‑gram indexes, permuterm indexes, and multi‑head attention differ in the way they handle combinatorial explosion, and why each method uses normalization or scaling.
+
+CONTEXT:
+
+[Information rtrival and web search/lecture3-tolerant-retrieval - slide 19 | neighbor | score 0.717]
+Permuterm index
+▪Query h*e
+▪Insert the special symbol at the end: 
+h*e$
+▪Rotate le term to have ‘*’ at the end: e$h*
+▪Search the terms starting with e$h by using B-tree 
+lookup:
+▪e$h  
+→  posting list of  “he”
+▪e$hol 
+ 
+→  posting list of “hole”
+▪e$hop 
+→  posting list of “hope”
+Sec. 3.2.1
+19
+Try all possibl rotattion ec
+Use a single B-tree. All the * can be served very easily.
+Why? To insert the * in any place. Solves the problem of * (wildcard) in the middle. The previous method required intersection.
+[NOTE] Try all possibl rotattion ec
+[NOTE] Use a single B-tree. All the * can be served very easily.
+[NOTE] Why? To insert the * in any place. Solves the problem of * (wildcard) in the middle. The previous method required intersection.
+
+[Information rtrival and web search/lecture3-tolerant-retrieval - slide 20 | seed | score 0.717]
+Permuterm index
+▪Queries:
+▪X    lookup on X$ 
+          X*   lookup on $X*
+▪*X   lookup on X$*           *X*  lookup on   X*
+▪X*Y lookup on Y$X* 
+    X*Y*Z    ??? 
+▪Permuterm problem: ≈ from 4 to 10 fold lexicon size
+Query = hel*o
+X=hel, Y=o
+Lookup o$hel*
+Sec. 3.2.1
+20
+Start from
+Z$X* (the same as X*Z)
+…. then filter out those 
+don‘t containing Y
+Empirical observation for English.
+put $ at the end rotate
+can't put $ at the end
+*X*$ -> X(*$*) = X*
+X is a prefix
+Look for any X prefix
+X*Y*Z
+X*Y*Z$
+Y*(Z$X*)
+Z$X*Y* -> look for Z$X* then somewhere then filter out strings
+that don't contain Y.
+[NOTE] put $ at the end rotate
+[NOTE] can't put $ at the end
+[NOTE] *X*$ -> X(*$*) = X*
+[NOTE] X is a prefix
+[NOTE] Look for any X prefix
+[NOTE] X*Y*Z
+X*Y*Z$
+Y*(Z$X*)
+Z$X*Y* -> look for Z$X* then somewhere then filter out strings
+that don't contain Y.
+
+[Information rtrival and web search/lecture3-tolerant-retrieval - slide 21 | neighbor | score 0.717]
+K-GRAM INDEX
+21
+
+[Information rtrival and web search/lecture3-tolerant-retrieval - slide 24 | neighbor | score 0.728]
+Processing wild-cards
+▪To get terms matching mon*, run the query on the 
+2nd inverted index as follows:
+▪$m AND mo AND on
+▪Gets terms that match the “AND query”: intersect list 
+of terms (termIDs)
+▪But we’d enumerate moon, which is wrong! 
+▪Must post-filter these terms against the query.
+▪Surviving enumerated terms are then looked up in the 
+term-document inverted index.
+▪We can also manage queries with a wildcard in the 
+middle: 
+▪mo*n               $mo*n$              $m AND mo AND n$  
+Sec. 3.2.2
+24
+intersection of 3 lists. Quite efficiently.
+False positive.
+Chop to bi-grams
+Start with m, end with n, and have mo
+somewhere in between.
+[NOTE] intersection of 3 lists. Quite efficiently.
+[NOTE] False positive.
+[NOTE] Chop to bi-grams
+[NOTE] Start with m, end with n, and have mo
+somewhere in between.
+
+[Information rtrival and web search/lecture3-tolerant-retrieval - slide 25 | seed | score 0.728]
+Permuterm vs 2-grams vs 3-grams
+▪Permuterm is not space efficient
+▪hello$, ello$h, llo$he, lo$hel, o$hell, $hello
+▪n is the average length of a term
+▪using $ as suffix, we add further n rotations to vocabulary
+▪size for a term of n chars: 
+(n+1) * (n+1) chars
+▪With 2-grams, considering the leading and trailing $
+▪$h, he, el, ll, lo, o$
+▪we have a size per term equal to   (n+1) * 2 chars
+▪With 3-grams, considering the leading and trailing $
+▪$he, hel, ell, llo, lo$
+▪we have a size per term equal to   n * 3 chars
+Sec. 3.2.2
+25
+6x6 per hello
+for n (5) we produce n+1 * n+1 = 6*6 terms
+[NOTE] for n (5) we produce n+1 * n+1 = 6*6 terms
+
+[Information rtrival and web search/lecture3-tolerant-retrieval - slide 26 | neighbor | score 0.728]
+Processing wild-card queries
+▪Wild-cards can result in expensive query execution 
+(very large disjunctions…)
+▪pyth* AND prog*
+▪If you encourage “laziness” people will respond!
+▪Which web search engines allow wildcard queries?
+Search
+Type your search terms, use ‘*’ if you need to.
+E.g., Alex* will match Alexander.
+Sec. 3.2.2
+26
+
+[Information rtrival and web search/lecture3-tolerant-retrieval2 - slide 19 | neighbor | score 0.751]
+Permuterm index
+▪Query h*e
+▪Insert the special symbol at the end: 
+h*e$
+▪Rotate le term to have ‘*’ at the end: e$h*
+▪Search the terms starting with e$h by using B-tree 
+lookup:
+▪e$h  
+→  posting list of  “he”
+▪e$hol 
+ 
+→  posting list of “hole”
+▪e$hop 
+→  posting list of “hope”
+Sec. 3.2.1
+19
+
+[Information rtrival and web search/lecture3-tolerant-retrieval2 - slide 20 | seed | score 0.751]
+Permuterm index
+▪Queries:
+▪X    lookup on X$ 
+          X*   lookup on $X*
+▪*X   lookup on X$*           *X*  lookup on   X*
+▪X*Y lookup on Y$X* 
+    X*Y*Z    ??? 
+▪Permuterm problem: ≈ from 4 to 10 fold lexicon size
+Query = hel*o
+X=hel, Y=o
+Lookup o$hel*
+Sec. 3.2.1
+20
+Start from
+Z$X* (the same as X*Z)
+…. then filter out those 
+don‘t containing Y
+Empirical observation for English.
+
+[Information rtrival and web search/lecture3-tolerant-retrieval2 - slide 21 | neighbor | score 0.751]
+K-GRAM INDEX
+21
+
+[Information rtrival and web search/lecture3-tolerant-retrieval2 - slide 24 | neighbor | score 0.728]
+Processing wild-cards
+▪To get terms matching mon*, run the query on the 
+2nd inverted index as follows:
+▪$m AND mo AND on
+▪Gets terms that match the “AND query”: intersect list 
+of terms (termIDs)
+▪But we’d enumerate moon, which is wrong! 
+▪Must post-filter these terms against the query.
+▪Surviving enumerated terms are then looked up in the 
+term-document inverted index.
+▪We can also manage queries with a wildcard in the 
+middle: 
+▪mo*n               $mo*n$              $m AND mo AND n$  
+Sec. 3.2.2
+24
+
+[Information rtrival and web search/lecture3-tolerant-retrieval2 - slide 25 | seed | score 0.728]
+Permuterm vs 2-grams vs 3-grams
+▪Permuterm is not space efficient
+▪hello$, ello$h, llo$he, lo$hel, o$hell, $hello
+▪n is the average length of a term
+▪using $ as suffix, we add further n rotations to vocabulary
+▪size for a term of n chars: 
+(n+1) * (n+1) chars
+▪With 2-grams, considering the leading and trailing $
+▪$h, he, el, ll, lo, o$
+▪we have a size per term equal to   (n+1) * 2 chars
+▪With 3-grams, considering the leading and trailing $
+▪$he, hel, ell, llo, lo$
+▪we have a size per term equal to   n * 3 chars
+Sec. 3.2.2
+25
+6x6 per hello
+
+[Information rtrival and web search/lecture3-tolerant-retrieval2 - slide 26 | neighbor | score 0.728]
+Processing wild-card queries
+▪Wild-cards can result in expensive query execution 
+(very large disjunctions…)
+▪pyth* AND prog*
+▪If you encourage “laziness” people will respond!
+▪Which web search engines allow wildcard queries?
+Search
+Type your search terms, use ‘*’ if you need to.
+E.g., Alex* will match Alexander.
+Sec. 3.2.2
+26
+
+[Learning with massive data/Assignment 2/Efficient_and_Robust_Approximate_Nearest_Neighbor_Search_Using_Hierarchical_Navigable_Small_World_Graphs - slide 9 | neighbor | score 0.718]
+5.2
+Comparison in Euclid Spaces
+The main part of the comparison was carried out on vector
+datasets with use of the popular K-ANNS benchmark ann-
+benchmark3 as a testbed. The testing system utilizes python
+bindings of the algorithms – it consequentially runs the
+K-ANN search for one thousand queries (extracted via ran-
+dom split of the initial dataset) with preset algorithm parame-
+ters producing an output containing the recall and average
+time of a single search. The considered algorithms are:
+1.
+Baseline NSW algorithm from nmslib 1.1 (“sw-
+graph”).
+2.
+FLANN 1.8.4 [6]. A popular library4 containing sev-
+eral algorithms, built-in in OpenCV5. We used the
+available auto-tuning procedure with several reruns
+to infer the best parameters.
+3.
+Annoy6, 02.02.2016 build. A popular algorithm based
+on random projection tree forest.
+4.
+VP-tree. A general metric space algorithm with met-
+ric pruning [50] implemented as a part of nmslib 1.1.
+5.
+FALCONN7, version 1.2. A new efﬁcient LSH
+algorithm for cosine similarity data [51].
+The comparison was done on a 4X Xeon E5-4650 v2
+Debian OS system with 128 Gb of RAM. For every
+algorithm, we carefully chose the best results at every recall
+range to evaluate the best possible performance (with initial
+values from the testbed defaults). All tests were done in a
+single thread regime. Hierarchical NSW was compiled
+using the GCC 5.3 with -Ofast optimization ﬂag.
+The parameters and description of the used datasets are
+outlined in Table 1. For all of the datasets except GloVe we
+used the L2 distance. For GloVe we used the cosine similar-
+ity (equivalent to L2 after vector normalization). The brute-
+force (BF) time is measured by the nmslib library.
+Results for the vector data are presented in Fig. 13. For
+SIFT, GloVE, DEEP and CoPhIR datasets Hierarchical NSW
+clearly outperforms the rivals by a large margin. For low
+dimensional data ðd ¼ 4Þ Hierarchical NSW is slightly faster
+at high recall compared to the Annoy while strongly outper-
+forms the other algorithms.
+5.3
+Comparison in General Spaces
+A recent comparison of algorithms [34] in general spaces (i.e.,
+non-symmetric or with violation of triangle inequality)
+showed that the baseline NSW algorithm has severe problems
+on low dimensional datasets. To test the performance of the
+Hierarchical NSW algorithm we have repeated a subset of
+tests from [34] on which NSW performed poorly or subopti-
+mal. For that purpose, we used a built-in nmslib testing sys-
+tem which had scripts to run tests from [34]. The evaluated
+algorithms included the VP-tree, permutation techniques
+(NAPP and brute-force ﬁltering) [49], [55], [56], [57], the basic
+NSW algorithm and NNDescent-produced proximity graphs
+[29] (both in pair with the NSW graph search algorithm). As
+in the original tests, for each dataset the test includes the
+results of either NSW or NNDescent, depending on which
+structure performed better. No custom distance functions or
+special memory management were used in this case for Hier-
+archical NSW leading to some performance loss.
+The datasets are summarized in Table 2. Further details
+of the datasets, spaces and algorithm parameter selection
+can be found in the original work [34]. The brute-force (BF)
+time is measured using the nmslib library.
+The results are presented in Fig. 14. Hierarchical NSW
+signiﬁcantly improves the performance of NSW and is the
+leader for any of the tested datasets. The strongest enhance-
+ment over NSW, almost by 3 orders of magnitude is
+observed for the dataset with the lowest dimensionality, the
+wiki-8 with JS-divergence. This is an important result that
+demonstrates the robustness of Hierarchical NSW, as for
+the original NSW this dataset was a stumbling block. Note
+Fig. 12. Comparison between NSW and Hierarchical NSW: (a) distance calculation number versus accuracy tradeoff for a 10 million 4-dimensional
+random vectors dataset; (b-c) performance scaling in terms of number of distance calculations (b) and raw query (c) time on a 8-dimensional random
+vectors dataset.
+TABLE 1
+Parameters of the Used Datasets on Vector Spaces Benchmark
+Dataset
+Description
+Size
+d
+BF time
+Space
+SIFT
+Image feature vectors [13]
+1M
+128
+94 ms
+L2
+GloVe
+Word embeddings trained
+on tweets [52]
+1.2M
+100
+95 ms
+Cosine
+CoPhIR
+MPEG-7 features extracted
+from the images [53]
+2M
+272
+370 ms
+L2
+Random
+vectors
+Random vectors in hyper-
+cube
+30M
+4
+590 ms
+L2
+DEEP
+One million subset of the bil-
+lion deep image
+1M
+96
+60 ms
+L2
+features dataset [14]
+MNIST
+Handwritten digit images
+[54]
+60k
+784
+22 ms
+L2
+3. https://github.com/erikbern/ann-benchmarks.
+4. https://github.com/mariusmuja/ﬂann.
+5. https://github.com/opencv/opencv.
+6. https://github.com/spotify/annoy.
+7. https://github.com/FALCONN-LIB/FALCONN.
+832
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE, VOL. 42, NO. 4, APRIL 2020
+Authorized licensed use limited to: Universita CaFoscari Venezia. Downloaded on April 24,2026 at 13:45:21 UTC from IEEE Xplore.  Restrictions apply.
+
+[Learning with massive data/Assignment 2/Efficient_and_Robust_Approximate_Nearest_Neighbor_Search_Using_Hierarchical_Navigable_Small_World_Graphs - slide 10 | seed | score 0.718]
+that for the wiki-8 to nullify the effect of implementation
+results are presented for the distance computations number
+instead of the CPU time.
+5.4
+Comparison with Product Quantization
+Based Algorithms
+Product quantization K-ANNS algorithms [10], [11], [12],
+[13], [14], [15], [16], [17] are considered as the state-of-the-art
+on billion scale datasets since they can efﬁciently compress
+stored data, allowing modest RAM usage while achieving
+millisecond search times on modern CPUs.
+To compare the performance of Hierarchical NSW
+against PQ algorithms we used the facebook Faiss library8
+as the baseline (a new library with state-of-the-art PQ
+algorithms [12], [15] implementations, released after the
+current manuscript was submitted) compiled with the
+OpenBLAS backend. The tests were done for a 200M subset
+of the 1B SIFT dataset [13] on a 4X Xeon E5-4650 v2 server
+with 128Gb of RAM. The ann-benchmark testbed was not
+feasible for these experiments because of its reliance on the
+32-bit ﬂoating point format (requiring more than 100 Gb
+just to store the data). To get the results for Faiss PQ algo-
+rithms we have utilized built-in scripts with the parameters
+from Faiss wiki9. For the Hierarchical NSW algorithm, we
+used a special build outside of the nmslib with a small
+memory footprint, simple non-vectorized integer distance
+functions and support for incremental index construction10.
+The results are presented in Fig. 15 with the summariza-
+tion of the parameters in Table 3. The peak memory con-
+sumption was measured by using Linux “time –v” tool in
+separate test runs after index construction for both of the
+algorithms. Even though Hierarchical NSW requires signiﬁ-
+cantly more RAM, it can achieve much higher accuracy
+while offering a massive advance in search speed and much
+faster index construction.
+The inset in Fig. 15 presents the scaling of the query time
+versus the dataset size for Hierarchical NSW. Note that the
+scaling deviates from pure logarithmic, possibly due to the
+relatively high dimensionality of the dataset.
+6
+DISCUSSION
+By using structure decomposition of navigable small world
+graphs together with the smart neighbor selection heuristic
+the proposed Hierarchical NSW approach overcomes several
+important problems of the basic NSW structure advancing
+the state-of-the-art in K-ANN search. Hierarchical NSW offers
+excellent performance and is a clear leader on a large variety
+of the datasets, surpassing the opensource rivals by a large
+margin in case of high dimensional data. Even for the datasets
+where the previous algorithm (NSW) has lost by orders of
+magnitude, Hierarchical NSW was able to come ﬁrst. Hierar-
+chical NSW supports continuous incremental indexing and
+can also be used as an efﬁcient method for getting approxima-
+tions of the k-NN and relative neighborhood graphs, which
+are byproducts of the index construction.
+Robustness of the approach is a strong feature which
+makes it very attractive for practical applications. The
+algorithm is applicable in generalized metric spaces perform-
+ing the best on any of the datasets tested in this paper and
+thus eliminating the need for complicated selection of the best
+Fig. 13. Results of the comparison of Hierarchical NSW with open source implementations of K-ANNS algorithms on ﬁve datasets for 10-NN
+searches. The time of a brute-force search is denoted as the BF.
+8. https://github.com/facebookresearch/faiss
+2017
+May
+build.
+From 2018 Faiss library has its own implementation of Hierarchical
+NSW.
+9. https://github.com/facebookresearch/faiss/wiki/Indexing-1G-
+vectors.
+10. https://github.com/nmslib/hnsw.
+MALKOV AND YASHUNIN: EFFICIENT AND ROBUST APPROXIMATE NEAREST NEIGHBOR SEARCH USING HIERARCHICAL NAVIGABLE...
+833
+Authorized licensed use limited to: Universita CaFoscari Venezia. Downloaded on April 24,2026 at 13:45:21 UTC from IEEE Xplore.  Restrictions apply.
+
+[Learning with massive data/Assignment 2/Efficient_and_Robust_Approximate_Nearest_Neighbor_Search_Using_Hierarchical_Navigable_Small_World_Graphs - slide 11 | neighbor | score 0.718]
+algorithm for a speciﬁc problem. We stress the importance of
+the algorithm’s robustness since the data may have a complex
+structure with different effective dimensionality across the
+scales. For instance, a dataset can consist of points lying on a
+curve that randomly ﬁlls a high dimensional cube, thus being
+high dimensional at large scale and low dimensional at small
+scale. In order to perform the efﬁcient search in such datasets,
+an approximate nearest neighbor algorithm has to work well
+for both cases of high and low dimensionality.
+There are several ways to further increase the efﬁciency
+and applicability of the Hierarchical NSW approach. There
+is still one meaningful parameter left which strongly affects
+the construction of the index – the number of added
+connections per layer M. Potentially, this parameter can be
+inferred directly by using different heuristics [4]. It would
+also be interesting to compare Hierarchical NSW on the full
+1B SIFT and 1B DEEP datasets [10], [11], [12], [13], [14] and
+add support for element updates and removal.
+One of the apparent shortcomings of the proposed
+approach compared to the basic NSW is the loss of the pos-
+sibility of distributed search. The search in the Hierarchical
+NSW structure always starts from the top layer, thus the
+structure cannot be made distributed by using the same
+techniques as described in [26] due to congestion of
+the higher layer elements. Simple workarounds can be used
+to distribute the structure, such as partitioning the data
+TABLE 2
+Used Datasets for Repetition of the Non-Metric Data Tests Subset
+Dataset
+Description
+Size
+d
+BF time
+Distance
+Wiki-sparse
+TF-IDF (term frequency-inverse
+document requency) vectors (cre-
+ated via GENSIM [58])
+4M
+105
+5.9 s
+Sparse cosine
+Wiki-8
+Topic histograms created from
+sparse TF-IDF vectors of the wiki-
+sparse dataset (created via ENSIM
+[58])
+2M
+8
+-
+Jensen- Shannon (JS)
+divergence
+Wiki-128
+Topic histograms created from
+sparse TF-IDF vectors of the wiki-
+sparse dataset (created via ENSIM
+[58])
+2M
+128
+1.17 s
+Jensen- Shannon (JS)
+divergence
+ImageNet
+Signatures extracted from LSVRC-
+2014 with SQFD (signature qua-
+dratic form) distance [59]
+1M
+272
+18.3 s
+SQFD
+DNA
+DNA (deoxyribonucleic acid) data-
+set sampled rom the Human
+Genome 5 [34].
+1M
+-
+2.4 s
+Levenshtein
+Fig. 14. Results of the comparison of Hierarchical NSW with general space K-ANNS algorithms from the Non-Metric Space Library on ﬁve datasets
+for 10-NN searches. The time of a brute-force search is denoted as the BF.
+834
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE, VOL. 42, NO. 4, APRIL 2020
+Authorized licensed use limited to: Universita CaFoscari Venezia. Downloaded on April 24,2026 at 13:45:21 UTC from IEEE Xplore.  Restrictions apply.
