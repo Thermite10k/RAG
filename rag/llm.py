@@ -17,10 +17,11 @@ from google.genai import types
 
 # Free-tier models are the Flash / Flash-Lite family. Model names change - check
 # Google AI Studio for the current list if this one is rejected.
-DEFAULT_LLM_MODEL = "gemini-2.5-flash"
+#DEFAULT_LLM_MODEL = "gemini-3.5-flash"
+DEFAULT_LLM_MODEL = "gemini-3.1-flash-lite"
 
 SYSTEM_PROMPT = (
-    "You are a study assistant. Answer the question using only the provided "
+    "You are a study assistant. Answer the question based on the provided "
     "slide context. When you use a slide, cite it as [doc - slide N]. If the "
     "context does not contain the answer, say so plainly instead of guessing."
 )

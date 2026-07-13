@@ -31,6 +31,8 @@ from .query import (
     answer_to_file,
 )
 
+from .llm import prompt_for_key, get_answer
+
 __all__ = [
     "parse_pdf",
     "parse_directory",
@@ -51,4 +53,6 @@ __all__ = [
     "order_for_reading",
     "assemble_context",
     "answer_to_file",
+    "prompt_for_key",
+    "get_answer"
 ]
